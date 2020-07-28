@@ -48,8 +48,9 @@ std::string& CSVFile::get(std::string const & cell){
 }
 
 void CSVFile::parse(std::string & cell){
+    /*
     std::vector <std::string> tokens;
-    std::regex e ( "([A-Za-z\\d])+");
+    std::regex e ("([A-Za-z\\d])+");
     std::sregex_iterator rend;
     std::sregex_iterator it( cell.begin(), cell.end(), e );
     while (it!=rend) {
@@ -57,6 +58,10 @@ void CSVFile::parse(std::string & cell){
         ++it;
     }
     tokens.push_back(std::string(1, cell[tokens[0].size() + 1]));
+    */
+    auto index_op = std::find_if(cell.begin(),cell.end(), [](const char & ch){
+        return ch == '+' || ch == '-' || ch == '*' || ch == '/';
+    }) - cell.begin();
     /*
     for (char const &c: cell){
         if(c == '=')
@@ -73,13 +78,13 @@ void CSVFile::parse(std::string & cell){
     }
     tokens.push_back(buff);
     */
-    std::string & arg1 = get(tokens[0]);
+    std::string & arg1 = get(cell.substr(1,index_op - 1));
     if(arg1[0] == '=')
         parse(arg1);
-    std::string & arg2 = get(tokens[1]);
+    std::string & arg2 = get(cell.substr(index_op + 1,cell.size() - 1));
     if(arg2[0] == '=')
         parse(arg2);
-    cell = oper_cells(arg1,tokens[2],arg2);
+    cell = oper_cells(arg1,cell[index_op],arg2);
 }
 
 void CSVFile::parse(){
@@ -101,9 +106,9 @@ void CSVFile::printCSV(){
 }
 
 
-std::string CSVFile::oper_cells(std::string const & arg1, std::string const & op, std::string const & arg2){
+std::string CSVFile::oper_cells(std::string const & arg1, char const & op, std::string const & arg2){
     int val;
-    switch (op[0]){
+    switch (op){
         case '+':
             val = std::stoi(arg1) + std::stoi(arg2);
             break;
