@@ -1,12 +1,7 @@
 #ifndef CSVFILE_H
 #define CSVFILE_H
-#include <vector>
-#include <string>
-#include <fstream>
-#include <sstream>
-#include <algorithm>
 #include <iostream>
-#include <regex>
+#include <vector>
 
 class CSVFile{
 public:

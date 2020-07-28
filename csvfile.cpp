@@ -1,4 +1,9 @@
 #include "csvfile.h"
+#include <string>
+#include <fstream>
+#include <sstream>
+#include <algorithm>
+#include <regex>
 
 CSVFile::CSVFile(char const * file_name){
     std::ifstream file(file_name);
@@ -18,7 +23,6 @@ CSVFile::CSVFile(char const * file_name){
             data.push_back(row);
             row.clear();
         }
-    file.close();
     //std::string str("B2");
     //std::string & val = get("B2");
     //std::string & val = get("B","2");
