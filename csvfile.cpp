@@ -49,8 +49,15 @@ std::string& CSVFile::get(std::string const & cell){
 
 void CSVFile::parse(std::string & cell){
     std::vector <std::string> tokens;
-    std::string buff;
-
+    std::regex e ( "([A-Za-z\\d])+");
+    std::sregex_iterator rend;
+    std::sregex_iterator it( cell.begin(), cell.end(), e );
+    while (it!=rend) {
+        tokens.push_back(it->str());
+        ++it;
+    }
+    tokens.push_back(std::string(1, cell[tokens[0].size() + 1]));
+    /*
     for (char const &c: cell){
         if(c == '=')
             continue;
@@ -65,14 +72,14 @@ void CSVFile::parse(std::string & cell){
         buff.push_back(c);
     }
     tokens.push_back(buff);
-
+    */
     std::string & arg1 = get(tokens[0]);
     if(arg1[0] == '=')
         parse(arg1);
-    std::string & arg2 = get(tokens[2]);
+    std::string & arg2 = get(tokens[1]);
     if(arg2[0] == '=')
         parse(arg2);
-    cell = oper_cells(arg1,tokens[1],arg2);
+    cell = oper_cells(arg1,tokens[2],arg2);
 }
 
 void CSVFile::parse(){
