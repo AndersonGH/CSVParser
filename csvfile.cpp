@@ -9,17 +9,11 @@ CSVFile::CSVFile(char const * file_name){
     std::ifstream file(file_name);
     std::string buff;
     std::vector <std::string> row;
-    bool first_enter;
     if(file)
         while(std::getline(file,buff)){
             std::stringstream s(buff);
-            first_enter = true;
-            while(std::getline(s,buff,',')){
-                if(first_enter)
-                    row_names.push_back(buff);
-                first_enter = false;
+            while(std::getline(s,buff,','))
                 row.push_back(buff);
-            }
             data.push_back(row);
             row.clear();
         }
@@ -33,7 +27,10 @@ CSVFile::CSVFile(char const * file_name){
 
 std::string& CSVFile::get(std::string const & column, std::string const & row){
     size_t col_it = std::find(data.front().begin(), data.front().end(), column) - data.front().begin();
-    size_t r_it = std::find(row_names.begin(), row_names.end(), row)- row_names.begin();
+    size_t r_it = std::find_if(data.begin(),data.end(), [row](std::vector<std::string> const & vec){
+        return vec[0] == row;
+        }) - data.begin();
+
     return data[r_it][col_it];
 }
 

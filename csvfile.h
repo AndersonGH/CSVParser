@@ -15,8 +15,6 @@ private:
     std::string oper_cells(std::string const &, char const &, std::string const &);
 
     std::vector<std::vector<std::string>> data;
-    std::vector<std::string> row_names;
-
 };
 
 #endif // CSVFILE_H
