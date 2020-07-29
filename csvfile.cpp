@@ -4,6 +4,7 @@
 #include <sstream>
 #include <algorithm>
 #include <regex>
+#include "myexception.h"
 
 CSVFile::CSVFile(char const * file_name){
     std::ifstream file(file_name);
@@ -17,20 +18,20 @@ CSVFile::CSVFile(char const * file_name){
             data.push_back(row);
             row.clear();
         }
-    //std::string str("B2");
-    //std::string & val = get("B2");
-    //std::string & val = get("B","2");
-    //std::cout << val;
-    parse();
+    else
+        throw MyException("File not found");
+    try {
+        parse();
+    } catch (const MyException & e) {
+        throw;
+    }
 }
-
 
 std::string& CSVFile::get(std::string const & column, std::string const & row){
     size_t col_it = std::find(data.front().begin(), data.front().end(), column) - data.front().begin();
-    size_t r_it = std::find_if(data.begin(),data.end(), [row](std::vector<std::string> const & vec){
+    size_t r_it = std::find_if(data.begin(),data.end(), [&row](std::vector<std::string> const & vec){
         return vec[0] == row;
         }) - data.begin();
-
     return data[r_it][col_it];
 }
 
@@ -45,43 +46,20 @@ std::string& CSVFile::get(std::string const & cell){
 }
 
 void CSVFile::parse(std::string & cell){
-    /*
-    std::vector <std::string> tokens;
-    std::regex e ("([A-Za-z\\d])+");
-    std::sregex_iterator rend;
-    std::sregex_iterator it( cell.begin(), cell.end(), e );
-    while (it!=rend) {
-        tokens.push_back(it->str());
-        ++it;
-    }
-    tokens.push_back(std::string(1, cell[tokens[0].size() + 1]));
-    */
     auto index_op = std::find_if(cell.begin(),cell.end(), [](const char & ch){
         return ch == '+' || ch == '-' || ch == '*' || ch == '/';
     }) - cell.begin();
-    /*
-    for (char const &c: cell){
-        if(c == '=')
-            continue;
-        if(c == '+' || c == '-' || c == '*' || c == '/'){
-            tokens.push_back(buff);
-            buff.clear();
-            buff.push_back(c);
-            tokens.push_back(buff);
-            buff.clear();
-            continue;
-        }
-        buff.push_back(c);
-    }
-    tokens.push_back(buff);
-    */
     std::string & arg1 = get(cell.substr(1,index_op - 1));
     if(arg1[0] == '=')
         parse(arg1);
     std::string & arg2 = get(cell.substr(index_op + 1,cell.size() - 1));
     if(arg2[0] == '=')
         parse(arg2);
-    cell = oper_cells(arg1,cell[index_op],arg2);
+    try {
+        cell = oper_cells(arg1,cell[index_op],arg2);
+    } catch (const MyException & e) {
+        throw;
+    }
 }
 
 void CSVFile::parse(){
@@ -102,8 +80,7 @@ void CSVFile::printCSV(){
     }
 }
 
-
-std::string CSVFile::oper_cells(std::string const & arg1, char const & op, std::string const & arg2){
+std::string CSVFile::oper_cells(std::string const & arg1, char const op, std::string const & arg2){
     int val;
     switch (op){
         case '+':
@@ -116,6 +93,8 @@ std::string CSVFile::oper_cells(std::string const & arg1, char const & op, std::
             val = std::stoi(arg1) * std::stoi(arg2);
             break;
         case '/':
+            if(std::stoi(arg2) == 0)
+                throw MyException("Division by zero");
             val = std::stoi(arg1) / std::stoi(arg2);
             break;
         }

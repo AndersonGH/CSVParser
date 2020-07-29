@@ -8,7 +8,8 @@ SOURCES += \
         main.cpp
 
 HEADERS += \
-    csvfile.h
+    csvfile.h \
+    myexception.h
 
 DISTFILES += \
     test.csv
