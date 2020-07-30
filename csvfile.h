@@ -8,8 +8,8 @@ public:
     CSVFile(char const *);
     void printCSV();
 private:
-    void parse();
-    void parse(std::string &);
+    void parse();//searching for cells with '='
+    void parse(std::string &);//calculate cell with '='
     std::string& get(std::string const &, std::string const &);
     std::string& get(std::string const &);
     std::string oper_cells(std::string const &, char const , std::string const &);
